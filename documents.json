@@ -1,11 +1,70 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
+    "name": "claim-assessment",
+    "title": "DRAFT: Warranty claim assessment",
+    "for_each": "SELECT id,number FROM claims",
+    "file": "number",
+    "sections": [
+      {
+        "title": "Recorded decision",
+        "note": "Internal assessment for review. Consumer guarantees are assessed separately from contractual warranty limits. Nothing sent.",
+        "sql": "SELECT number,name,status,owner,currency,claimed_cents,approved_cents,reviewer,decision_reason,rights_review,decided_on,evidence_ref FROM v_claims WHERE id=$1"
+      },
+      {
+        "title": "Assets and checks",
+        "sql": "SELECT serial,product,failure_code,contractual_check,currency,claimed_cents FROM v_coverage WHERE claim_id=$1"
+      },
+      {
+        "title": "Record gaps",
+        "sql": "SELECT rule,finding,source FROM v_compliance WHERE claim_id=$1"
+      }
+    ]
+  },
+  {
+    "name": "return-authorisation",
+    "title": "DRAFT: Returned part authorisation",
+    "for_each": "SELECT id,name FROM part_returns",
     "file": "name",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Return details",
+        "note": "Use the agreed carrier and handling instructions. Do not ship a hazardous component without the responsible person reviewing its handling.",
+        "sql": "SELECT name,number,serial,failure_code,due_on,received_on,tracking_ref,disposition FROM v_returns WHERE id=$1"
+      }
+    ]
+  },
+  {
+    "name": "supplier-recovery",
+    "title": "DRAFT: Supplier recovery request",
+    "for_each": "SELECT id,name FROM recoveries",
+    "file": "name",
+    "sections": [
+      {
+        "title": "Recovery statement",
+        "note": "A request record, not an invoice, payment instruction or automatic entitlement. Amounts remain in the claim currency.",
+        "sql": "SELECT name,number,supplier,currency,requested_cents,recovered_cents,outstanding_cents,due_on,credit_ref FROM v_recoveries WHERE id=$1"
+      },
+      {
+        "title": "Claim evidence",
+        "sql": "SELECT c.number,c.name,c.evidence_ref,c.reviewer,c.decision_reason FROM recoveries r JOIN claims c ON c.id=r.claim_id WHERE r.id=$1"
+      }
+    ]
+  },
+  {
+    "name": "safety-review",
+    "title": "DRAFT: Product safety review record",
+    "for_each": "SELECT id,number FROM claims WHERE injury_awareness_on IS NOT NULL",
+    "file": "number",
+    "sections": [
+      {
+        "title": "Awareness and reporting evidence",
+        "note": "Internal record only. This does not submit a statutory report. The responsible person checks applicable reporting rules.",
+        "sql": "SELECT number,name,owner,injury_awareness_on,safety_country,injury_awareness_on+2 AS au_review_deadline,safety_reported_on,safety_report_ref FROM claims WHERE id=$1"
+      },
+      {
+        "title": "Issues",
+        "sql": "SELECT rule,finding,source FROM v_compliance WHERE claim_id=$1"
+      }
     ]
   }
 ]

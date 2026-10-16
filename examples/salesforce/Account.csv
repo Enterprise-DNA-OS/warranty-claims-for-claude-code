@@ -1,0 +1,4 @@
+Id,Name,Role,BillingCountryCode
+A-101,Demo Import Customer,customer,NZ
+A-102,Demo Import Supplier,supplier,AU
+A-103,Demo Import Dealer,dealer,NZ

@@ -1,13 +1,45 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Warranty Claims for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Warranty desk: this week",
+    "subtitle": "Open claims, customer contact and returned parts",
     "sections": [
       {
         "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "sql": "SELECT number,reason,detail,owner FROM v_attention ORDER BY number,reason"
+      },
+      {
+        "title": "Claim queue",
+        "sql": "SELECT number,status,owner,currency,claimed_cents,age_days FROM v_claims ORDER BY age_days DESC"
+      }
+    ]
+  },
+  {
+    "name": "recovery",
+    "title": "Supplier recovery",
+    "sections": [
+      {
+        "title": "Outstanding supplier credits",
+        "sql": "SELECT name,number,supplier,currency,requested_cents,recovered_cents,outstanding_cents,due_on FROM v_recoveries ORDER BY due_on"
+      },
+      {
+        "title": "Failure patterns",
+        "sql": "SELECT * FROM v_failures ORDER BY currency,claimed_cents DESC"
+      }
+    ]
+  },
+  {
+    "name": "compliance",
+    "title": "Warranty record checks",
+    "subtitle": "Evidence gaps for operator review, not a legal determination",
+    "sections": [
+      {
+        "title": "Checks and source references",
+        "sql": "SELECT number,rule,finding,source FROM v_compliance ORDER BY number,rule"
+      },
+      {
+        "title": "Contractual limits",
+        "sql": "SELECT number,serial,product,contractual_check,currency,claimed_cents FROM v_coverage ORDER BY number,serial"
       }
     ]
   }

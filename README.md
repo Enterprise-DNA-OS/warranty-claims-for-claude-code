@@ -1,115 +1,141 @@
-<h1 align="center">Warranty Claims for Claude Code</h1>
+# Warranty Claims for Claude Code
 
-<p align="center">
-  <strong>The open-source warranty claims system that is just a database and Claude Code.</strong>
-</p>
+Warranty claims, serial numbers, returned parts and supplier credits in a database you own. Free MIT code from Enterprise DNA. Works with Claude Code, Codex, OpenCode or Cursor.
 
-<p align="center">
-  Created by <a href="https://www.enterprisedna.co"><strong>Enterprise DNA</strong></a>. Free and open source. Works with Claude Code, Codex, OpenCode or Cursor.
-</p>
+| Do it yourself | We customise it | We run it for you |
+|---|---|---|
+| Free code. Clone, install and run the demo. Hosting and coding-agent costs are yours. | Your records, rules, Salesforce history, screens and connections. [Get your version built](https://enterprisedna.co/omni/book?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management). | Installed and operated through Omni by Enterprise DNA. One setup fee, then a retainer. [Book a call](https://enterprisedna.co/omni/book?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management). |
 
-<!-- three-doors -->
-<table align="center">
-  <tr>
-    <td align="center"><strong>Do it yourself</strong><br/>Clone it, run it, own it. Free, MIT.<br/><a href="#quick-start">Quick start</a></td>
-    <td align="center"><strong>We customise it</strong><br/>Your fields, your rules, your Salesforce Warranty Lifecycle Management data brought across.<br/><a href="https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management">Book a call</a></td>
-    <td align="center"><strong>We run it for you</strong><br/>Installed, connected and operated inside Omni. Setup fee, then a retainer.<br/><a href="https://enterprisedna.co/omni/instead-of/salesforce-warranty-management?utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management">How it works</a></td>
-  </tr>
-</table>
+## What this covers
 
-<p align="center">
-  <a href="#what-is-this">What is this</a> &bull;
-  <a href="#why-no-front-end">Why no front end</a> &bull;
-  <a href="#quick-start">Quick start</a> &bull;
-  <a href="#the-commands">Commands</a> &bull;
-  <a href="#instead-of-salesforce-warranty-management">Instead of Salesforce Warranty Lifecycle Management</a> &bull;
-  <a href="#want-it-installed-and-run-for-you">Installed for you</a> &bull;
-  <a href="#license">License</a>
-</p>
+A manufacturer's or distributor's warranty desk: log a claim against a serial number, check recorded warranty dates and usage, review evidence, record an operator decision, chase returned parts and reconcile supplier credits. This is a focused claims system, not the whole Salesforce platform.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Node-20+-339933?style=flat-square" alt="Node 20+" />
-  <img src="https://img.shields.io/badge/PostgreSQL-any-336791?style=flat-square" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/PGlite-embedded-3ecf8e?style=flat-square" alt="PGlite" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
-</p>
-
----
-
-## What is this
-
-Warranty Claims for Claude Code does the job you pay Salesforce Warranty Lifecycle Management for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the Salesforce Warranty Lifecycle Management dashboard cannot.
-
-<!-- TODO(author): the annual bill. One sentence: what a 10 to 50 person business typically pays Salesforce Warranty Lifecycle Management per year, all in, with a source. -->
-
-Want the same thing with a web front end, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management).
-
-<!-- TODO(author): two or three sentences on what this specific product covers and who it is for. -->
-
-## Why no front end
-
-- The front end was only ever there because the database was hard to talk to. That is no longer true.
-- Your data sits in plain Postgres tables you own. Any tool can read them. No export, no lock-in.
-- No seats, no tiers, no add-ons. Read [docs/why-no-front-end.md](docs/why-no-front-end.md) for the honest trade-offs too.
+Salesforce lists Manufacturing Cloud Service Core at US$275 per user per month, billed annually. Ten users illustrate US$33,000 a year before implementation. That is a list-price calculation, not a verified customer invoice or a standalone warranty-module quote. [Salesforce pricing](https://www.salesforce.com/manufacturing/cloud/pricing/), checked 16 October 2026. Confirm the edition and warranty entitlements in your actual quote.
 
 ## Quick start
 
-Sixty seconds, no database install (an embedded Postgres runs inside Node):
+Node 20 or newer. No database server needed for the local demo.
 
 ```bash
 git clone https://github.com/Enterprise-DNA-OS/warranty-claims-for-claude-code.git
 cd warranty-claims-for-claude-code
 npm install
+npm test
 npm run demo
 ```
 
-Then open the folder in Claude Code and type a slash command. <!-- TODO(author): name the first command to try. -->
+The demo deliberately contains late contact, an overdue returned part, missing usage evidence, a partial supplier credit and a safety review. All names and data are fictional. The demo uses .data/demo even when DATABASE_URL is configured, keeping it separate from real records.
 
-### Use it with your own Postgres or Supabase
+For another demo query on Linux or macOS:
 
-Copy `.env.example` to `.env`, set `DATABASE_URL`, then `npm run migrate`. Same commands, shared data, no per-seat fee.
+```bash
+DATA_DIR=.data/demo node scripts/warranty.mjs coverage
+DATA_DIR=.data/demo npm run view
+DATA_DIR=.data/demo npm run docs
+```
+
+On PowerShell, set `$env:DATA_DIR='.data/demo'` first, then run the same commands without the DATA_DIR prefix. For real work choose a fresh DATA_DIR, run npm run migrate and import your records without seeding. For a controlled PostgreSQL connection, set DATABASE_URL in a local .env file. See docs/cli.md.
 
 ## The commands
 
-<!-- TODO(author): a table of the slash commands in .claude/commands and what each one does. -->
-
-| Command | What it does |
+| Command | Result |
 |---|---|
-| `/...` | ... |
+| `/claims` | List warranty claims with status, owner, age and costs. |
+| `/claim` | Read a claim, linked assets, returns, supplier recoveries and its notes. |
+| `/assets` | List serialised products and the customer who owns each one. |
+| `/asset` | Read one serial number, its warranties and claim history. |
+| `/parties` | List customers, dealers and suppliers. |
+| `/products` | List product codes and their suppliers. |
+| `/terms` | Read contractual warranty periods and recorded usage limits. |
+| `/coverage` | Check claim failure dates and usage against the recorded contractual limits. |
+| `/triage` | Review unresolved claims by age, evidence and claimed amount. |
+| `/attention` | Find late contact, missing evidence, overdue parts and supplier balances. |
+| `/compliance` | Check consumer review, Australian safety reporting evidence and decision records. |
+| `/returns-due` | Find parts still waiting to arrive, oldest due first. |
+| `/returns` | Read all returned-part records and their disposition. |
+| `/recoveries` | Read supplier requests, cumulative credits and outstanding balances. |
+| `/failure-patterns` | Group claim costs and affected assets by product, fault and currency. |
+| `/dashboard` | Summarise claims and costs by stage and currency. |
+| `/insights` | Answer ten questions across claims, serial numbers, suppliers and reviews. |
+| `/add` | Create a customer, product, asset, term, warranty, claim, item, return or recovery. |
+| `/review` | Move a submitted claim into the review queue. |
+| `/evidence` | Record the reference to a claim inspection or supporting document. |
+| `/adjudicate` | Record the operator's explicit claim decision with the reason and evidence. |
+| `/close` | Close a decided claim once outstanding part returns and required checks are resolved. |
+| `/receive` | Record a returned part as received and set its inspection disposition. |
+| `/recover` | Record cumulative supplier credit against a recovery request. |
+| `/usage` | Record the observed usage and unit for a claim item. |
+| `/safety` | Record serious-harm awareness and the evidence of a report already submitted. |
+| `/log` | Add an operator note and, when stated, the date of actual customer contact. |
+| `/weekly-review` | Draft the Monday review from attention, dashboard and compliance results. |
+| `/draft-claim` | Draft a claim assessment for operator review, without sending. |
+| `/draft-recovery` | Draft a supplier recovery follow-up from the recorded balance. |
+| `/import` | Bring supported Salesforce reports across in one transaction, after a trial run. |
+| `/export` | Export every domain record, source row, note and audit event as JSON. |
+| `/view` | Render the week, supplier recovery and record-check dashboards. |
+| `/documents` | Render draft claim assessments, part authorisations, recovery requests and safety records. |
+| `/customise` | Change a field, rule or workflow in plain language. |
+| `/new-view` | Add a read-only view that answers the operator's own question. |
 
-## Instead of salesforce-warranty-management
+## Ten questions across your records
 
-<!-- TODO(author): how to bring data across from Salesforce Warranty Lifecycle Management; link docs/replace-salesforce-warranty-management.md -->
+Every question runs today with `node scripts/warranty.mjs insights`. These combine the records and checks in this build. They are not a claim that a configured Salesforce report can never answer the same question.
 
-## Architecture
+1. Which open claims need both a consumer-rights review and a returned part?
+2. Which product and fault combinations account for the largest claimed cost?
+3. Which serial numbers have repeat claims?
+4. How much approved cost remains after supplier recoveries, by currency?
+5. Which owners have the oldest unresolved claims?
+6. Which supplier balances are late despite a partial credit?
+7. Which claims have no evidence reference and no recent contact?
+8. Which contractual checks cannot finish because usage evidence is missing?
+9. Which dealers supplied assets with repeat failure codes?
+10. Which Australian serious-harm records still need reporting evidence?
 
+## Record checks, documents and views
+
+Contractual coverage compares the failure date and observed usage with recorded warranties. It never decides legal entitlement. Consumer review and Australian safety-report evidence checks cite primary sources in [docs/compliance.md](docs/compliance.md). All decisions remain the operator's. No email, regulator report or payment is sent.
+
+`npm run docs` creates branded draft claim assessments, return authorisations, supplier recovery requests and safety review records. `npm run view` creates the week, supplier recovery and compliance dashboards. Set the business name, logo and colours in brand.json. The output is read-only HTML with no server or action buttons.
+
+## Your first hour: ten things to ask for
+
+1. Show me the claims nobody has contacted this week.
+2. Show me the full record for WC-1001.
+3. Which serial numbers have failed more than once?
+4. Which claims need a consumer-rights review?
+5. Which parts are overdue back from the dealer?
+6. How much supplier credit remains outstanding?
+7. Draft the Monday review from the current records.
+8. Draft a recovery request for REC-101.
+9. Import my mapped Salesforce reports after a trial run.
+10. Add our inspection engineer field and a view of claims waiting on that engineer.
+
+## Instead of Salesforce Warranty Lifecycle Management
+
+Export supported detail reports with their stable relationship IDs. Put the mapped CSV files in one folder. A single import validates all supported files together and either commits them all or rolls them all back. Original rows are retained. Repeating unchanged source rows is safe; changed source rows stop for reconciliation. Read [the switching guide](docs/replace-salesforce-warranty-management.md) for exact columns, enrichment fields and limits.
+
+```bash
+node scripts/warranty.mjs import salesforce --dir=imports/salesforce --dry-run --actor="Operator"
+node scripts/warranty.mjs import salesforce --dir=imports/salesforce --actor="Operator"
 ```
-warranty-claims-for-claude-code/
-  CLAUDE.md                 how the operator wants this run (routing table + house rules)
-  AGENTS.md                 the same, for Codex / OpenCode / Cursor / Gemini CLI
-  .claude/commands/         the slash commands
-  scripts/                  the CLI the commands drive
-  scripts/lib/db.mjs        one adapter: DATABASE_URL (pg) or embedded PGlite
-  supabase/migrations/      plain SQL schema
-  supabase/seed.sql         demo data
-  docs/                     the thesis and the migration guide
-```
 
-## Built for coding agents
+Historical vendor approvals stay in the original source row until reviewed; they do not create new local decisions. Attachments, portals, automation, detailed contract exclusions and legacy payment records need a separate mapping and build. Enterprise DNA can scope those for your version.
 
-The database, CLI and command recipes work with Claude Code, Codex, OpenCode or Cursor. Ask your coding agent for a new command and have it implement and test the change against the same records.
+## How it is built
 
-## Contributing
+Plain PostgreSQL migrations, the same queries on embedded PGlite, one CLI and one command library. Every domain record has an ID and timestamps. The audit log keeps the before and after state of CLI mutations. Source imports retain raw rows. RLS blocks public access by default; the local database owner has access. This is not an authenticated multi-user service or an immutable audit product. Shared production use needs deployment controls, backups and a tested restoration procedure.
 
-Issues and pull requests are welcome. Keep the shape: plain SQL, a small CLI, a slash command per recurring job, no front end.
+No mobile capture, offline sync or customer portal is included. [Why no front end](docs/why-no-front-end.md) explains the operating shape. Change fields through /customise and add read-only views through /new-view. Use new migrations rather than rewriting history.
 
-## Want it installed and run for you?
+## Validation
 
-Enterprise DNA installs Warranty Claims for Claude Code for your business, migrates your Salesforce Warranty Lifecycle Management data, connects it to the rest of your tools, and runs it for you as part of **Omni**, our managed Command Center. One setup fee, then a monthly retainer.
+`npm test` uses an isolated temporary database and output directory. It exercises every CLI command, rollback on failed imports, date and amount validation, repeat imports, consumer review gates, safety evidence, full exports and HTML rendering. CI runs Node 20 and 22 on Linux and Windows.
 
-- Book a call: [enterprisedna.co/omni/book](https://enterprisedna.co/omni/book/?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management)
-- Read more: [enterprisedna.co/omni/instead-of/salesforce-warranty-management](https://enterprisedna.co/omni/instead-of/salesforce-warranty-management?utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management)
+## Built and run for you
 
-## License
+Omni by Enterprise DNA can bring your Salesforce records across, customise the rules and operate your version. One setup fee, then a monthly retainer. [Book Sam's 30-minute call](https://enterprisedna.co/omni/book?offer=replace-software&utm_source=github&utm_medium=readme&utm_campaign=salesforce-warranty-management).
 
-MIT. Copyright (c) 2026 Enterprise DNA.
+## Licence
+
+MIT. Copyright (c) 2026 Enterprise DNA. Salesforce is a trademark of Salesforce, Inc. This independent project is not affiliated with or endorsed by Salesforce.

@@ -1,0 +1,2 @@
+Id,ClaimNumber,Name,CreatedDate,Failure Date,Owner Name,CurrencyIsoCode,Evidence Reference,Last Contact Date,Status
+C-101,IMP-CLAIM-01,Demo import claim,2026-09-02T00:00:00Z,2026-09-01,Jordan,NZD,inspection/IMP-01,2026-09-03,Approved

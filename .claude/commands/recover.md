@@ -1,0 +1,15 @@
+---
+description: "Record cumulative supplier credit against a recovery request."
+---
+
+# recover
+
+Record cumulative supplier credit against a recovery request.
+
+Read CLAUDE.md and docs/cli.md first. Resolve names by reading the records. If the name is ambiguous, show the candidates and ask for the exact record.
+
+```bash
+node scripts/warranty.mjs recover "<recovery>" --amount=<cumulative amount> --ref="<credit reference>" --actor="<operator>" --json
+```
+
+Read the full linked claim before writing. Record only the decision, event, date, amount and reference that the operator actually stated. A claim decision or recovery record never moves money. Safety records never submit reports. Show unresolved checks after the change.
